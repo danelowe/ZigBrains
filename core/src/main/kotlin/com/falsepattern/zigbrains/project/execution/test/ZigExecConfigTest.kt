@@ -28,10 +28,13 @@ import com.intellij.execution.ExecutionException
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.execution.testframework.sm.runner.SMRunnerConsolePropertiesProvider
+import com.intellij.execution.testframework.sm.runner.SMTRunnerConsoleProperties
 import com.intellij.openapi.project.Project
 import kotlin.io.path.pathString
 
-class ZigExecConfigTest(project: Project, factory: ConfigurationFactory): ZigExecConfig<ZigExecConfigTest>(project, factory, ZigBrainsBundle.message("exec.type.test.label")) {
+class ZigExecConfigTest(project: Project, factory: ConfigurationFactory):     SMRunnerConsolePropertiesProvider,
+    ZigExecConfig<ZigExecConfigTest>(project, factory, ZigBrainsBundle.message("exec.type.test.label")) {
     var filePath = FilePathConfigurable("filePath", ZigBrainsBundle.message("exec.option.label.file-path"))
         private set
     var optimization = OptimizationConfigurable("optimization")
@@ -42,15 +45,18 @@ class ZigExecConfigTest(project: Project, factory: ConfigurationFactory): ZigExe
     @Throws(ExecutionException::class)
     override suspend fun buildCommandLineArgs(debug: Boolean): List<String> {
         val result = ArrayList<String>()
+        result.add("build")
         result.add("test")
-        result.add(filePath.path?.pathString ?: throw ExecutionException(ZigBrainsBundle.message("exception.zig.empty-file-path")))
         if (!debug || optimization.forced) {
-            result.addAll(listOf("-O", optimization.level.name))
+            result.add("-Doptimize="+optimization.level.name)
         }
         result.addAll(compilerArgs.argsSplit())
         if (debug) {
             result.add("--test-no-exec")
         }
+        result.add("--")
+        result.add("--test-runner-test-file")
+        result.add(filePath.path?.pathString ?: throw ExecutionException(ZigBrainsBundle.message("exception.zig.empty-file-path")))
         return result
     }
 
@@ -71,5 +77,11 @@ class ZigExecConfigTest(project: Project, factory: ConfigurationFactory): ZigExe
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): ZigProfileState<ZigExecConfigTest> {
         return ZigProfileStateTest(environment, this)
+    }
+
+    override fun createTestConsoleProperties(executor: Executor): SMTRunnerConsoleProperties {
+        val properties = ZigTestConsoleProperties(this, executor)
+        properties.isIdBasedTestTree = true
+        return properties
     }
 }

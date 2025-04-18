@@ -26,6 +26,7 @@ val lsp4ijNightly = property("lsp4ijNightly").toString().toBoolean()
 val useInstaller = property("useInstaller").toString().toBoolean()
 val lsp4ijPluginString = "com.redhat.devtools.lsp4ij:$lsp4ijVersion${if (lsp4ijNightly) "@nightly" else ""}"
 val ideaCommunityVersion: String by project
+val ideaVersion: String by project
 val clionVersion: String by project
 
 group = "com.falsepattern"
@@ -99,6 +100,7 @@ allprojects {
 dependencies {
     intellijPlatform {
         when(runIdeTarget) {
+            "idea" -> create(IntelliJPlatformType.IntellijIdeaUltimate, ideaVersion, useInstaller = useInstaller)
             "ideaCommunity" -> create(IntelliJPlatformType.IntellijIdeaCommunity, ideaCommunityVersion, useInstaller = useInstaller)
             "clion" -> create(IntelliJPlatformType.CLion, clionVersion, useInstaller = useInstaller)
         }

@@ -34,6 +34,7 @@ import com.falsepattern.zigbrains.shared.ipc.ipc
 import com.intellij.build.BuildTextConsoleView
 import com.intellij.execution.DefaultExecutionResult
 import com.intellij.execution.ExecutionException
+import com.intellij.execution.Executor
 import com.intellij.execution.configurations.CommandLineState
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.configurations.PtyCommandLine
@@ -41,6 +42,7 @@ import com.intellij.execution.filters.TextConsoleBuilder
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.process.ProcessTerminatedListener
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.project.Project
 import com.intellij.platform.ide.progress.ModalTaskOwner
 import com.intellij.terminal.TerminalExecutionConsole
